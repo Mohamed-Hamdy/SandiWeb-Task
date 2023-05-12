@@ -46,7 +46,7 @@ CREATE TABLE `products` (
 --
 
 INSERT INTO `products` (`id`, `sku`, `name`, `type`, `price`, `value`, `size`, `weight`, `height`, `width`, `length`) VALUES
-(53, 'th12356', 'q', 'DVD', 0, 'Size : 5 MB', 5, 0, 0, 0, 0);
+(1, 'TH100', 'Test Product', 'DVD', 0, 'Size : 5 MB', 5, 0, 0, 0, 0);
 
 --
 -- Indexes for dumped tables
@@ -66,7 +66,7 @@ ALTER TABLE `products`
 -- AUTO_INCREMENT for table `products`
 --
 ALTER TABLE `products`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=54;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
