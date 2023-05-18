@@ -1,14 +1,16 @@
 <?php
-
+require_once(CORE . 'DB.php');
 
 
 class ProductsController extends Controller
 {
     private $conn;
+
+
     private $pb;
     public function __construct()
     {
-        $this->conn = new Products();
+        $this->conn = new DB();
     }
 
 
@@ -35,20 +37,9 @@ class ProductsController extends Controller
         $width = $_POST['width'];
         $length = $_POST['length'];
 
+
         $value = "";
-        // check product type 
-        if ($type == 'DVD') {
-            $value = "Size : " . strval($size) . " MB";
-            $weight = $height = $width = $length = 0;
-        } else if ($type == "Book") {
-            $value = "weight : " . strval($weight) . " KG";
-            $size = $height = $width = $length = 0;
-        } else if ($type == "Furniture") {
-            $value = "Dimensions : " . $width . "x" . $height . "x" . $length . " CM";
-            $weight = $size = 0;
-        }
-        $this->conn = new Products();
-        $dataInsert = array(
+        $ProductArray = array(
             "sku" => $sku,
             "name" => $name,
             "type" => $type,
@@ -60,23 +51,27 @@ class ProductsController extends Controller
             "length" => $length,
             "value" => $value,
         );
-        //print_r($dataInsert);
-        $len = isset($this->conn->getProductusingSKU($sku)[0]) ? count($this->conn->getProductusingSKU($sku)[0]) : 0;
 
-        //print_r($data['row']['sku']);
-        if ($len != 0) {
-            $data['error'] = "SKU Must be unique";
-            return $this->view('products/add', $data);
-        } else {
-            if ($this->conn->insertProducts($dataInsert)) {
-                $data['success'] = "Data Added Successfully";
-                //print_r($data);
+        $className = "App\\Models\\ProductTypes\\" . $type;
+        if (class_exists($className)) {
+            $object = new $className();
+            $object->setValues($ProductArray);
+            
+            $len = $this->conn->getProductusingSKU($sku);
+            if ($len != 0) {
+                $data['error'] = "SKU Must be unique";
                 return $this->view('products/add', $data);
             } else {
-
-                $data['error'] = "Error";
-                return $this->view('products/add', $data);
+                if ($this->conn->insertProducts($object)) {
+                    $data['success'] = "Data Added Successfully";
+                    return $this->view('products/add', $data);
+                } else {
+                    $data['error'] = "Error";
+                    return $this->view('products/add', $data);
+                }
             }
+        } else {
+            echo "This ClassName is not exists";
         }
     }
 
@@ -91,16 +86,5 @@ class ProductsController extends Controller
         }
         $data['success'] = "Product Have Been Deleted";
         header('Location: /products/index');
-    }
-
-    public function getValue($id)
-    {
-        if ($this->conn->calculateValue($id)) {
-            $data['success'] = "Product Have Been Deleted";
-            return $this->view('products/delete', $data);
-        } else {
-            $data['error'] = "Error";
-            return $this->view('products/delete', $data);
-        }
     }
 }
